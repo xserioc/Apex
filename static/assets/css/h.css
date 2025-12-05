@@ -1,0 +1,196 @@
+.center {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.title {
+   font-size: 10vh;
+   color: white;
+   font-family: "Inter", sans-serif;
+   text-align: center;
+   text-transform: uppercase;
+   letter-spacing: 3px;
+   margin-top: 15vh;
+   margin-bottom: 3vh;
+   transition: 0.35s ease;
+   text-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+   font-weight: 900;
+}
+
+.title:hover {
+   transform: translateY(-5%) scale(1.05);
+   text-shadow: 0 0 50px rgba(0, 212, 255, 0.6);
+}
+
+@media (orientation: portrait) {
+   .title {
+      position: relative;
+      top: -10vw;
+      font-size: 10vw;
+      color: var(--text-primary);
+      font-family: "Inter", sans-serif;
+      text-align: center;
+      text-transform: uppercase;
+      border-radius: 0px 0px 5px 5px;
+   }
+}
+
+.search-container {
+   display: flex;
+   width: 100%;
+   text-align: center;
+   justify-content: center;
+   align-items: center;
+}
+
+.truncate {
+   width: 50vw;
+   height: 5vh;
+   font-family: "Poppins", sans-serif;
+   font-size: 16px;
+   box-shadow: 0 0 15px 2px rgba(0, 0, 0, 0.2);
+   background: var(--background-input);
+   -webkit-backdrop-filter: var(--backdrop-filter);
+   backdrop-filter: var(--backdrop-filter);
+}
+
+input {
+   padding: 18px 28px;
+   width: 500px;
+   border-radius: 14px;
+   background: rgba(0, 212, 255, 0.08);
+   border: 2px solid var(--tab-active-background);
+   text-align: center;
+   font-size: 18px;
+   color: var(--text-primary);
+   transition: all 0.4s ease;
+   backdrop-filter: blur(10px);
+   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+input:focus {
+   background: rgba(0, 212, 255, 0.15);
+   border-color: var(--text-dark);
+   box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 10px rgba(0, 212, 255, 0.1);
+   transform: scale(1.02);
+}
+
+#particles-js {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   top: 0vw;
+   background-color: var(--bg-c);
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-position: 50% 50%;
+   overflow: hidden;
+}
+
+.particles-js-canvas-el {
+   z-index: 0;
+   top: 0;
+   left: 0;
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   pointer-events: none;
+}
+
+#splash {
+   color: #00d4ff;
+   margin-bottom: 2em;
+   margin-top: -1em;
+   padding: 0;
+   font-family: "Poppins", sans-serif;
+   font-size: 16px;
+   font-weight: 500;
+}
+
+.features-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   gap: 20px;
+   margin-top: 4em;
+   width: 80%;
+   max-width: 1000px;
+}
+
+.feature-card {
+   background: rgba(0, 212, 255, 0.08);
+   border: 2px solid rgba(0, 212, 255, 0.3);
+   border-radius: 14px;
+   padding: 28px;
+   text-align: center;
+   transition: all 0.4s ease;
+   cursor: pointer;
+   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card:hover {
+   transform: translateY(-6px) scale(1.05);
+   border-color: var(--tab-active-background);
+   box-shadow: 0 12px 25px rgba(0, 212, 255, 0.25);
+   background: rgba(0, 212, 255, 0.12);
+}
+
+.feature-icon {
+   font-size: 40px;
+   color: #00d4ff;
+   margin-bottom: 12px;
+}
+
+.feature-title {
+   color: white;
+   font-size: 18px;
+   font-weight: 600;
+   margin-bottom: 8px;
+}
+
+.feature-desc {
+   color: #9ca3af;
+   font-size: 13px;
+   line-height: 1.4;
+}
+
+.logo-container {
+   margin-top: 10vh;
+   margin-bottom: 2vh;
+   animation: logoFadeIn 0.8s ease-out;
+}
+
+.home-logo {
+   width: 140px;
+   height: 140px;
+   object-fit: contain;
+   filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.4));
+   transition: all 0.3s ease;
+}
+
+.home-logo:hover {
+   filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.6)) brightness(1);
+   transform: scale(1.1);
+}
+
+@keyframes logoFadeIn {
+   from {
+      opacity: 0;
+      transform: scale(0.8);
+   }
+   to {
+      opacity: 1;
+      transform: scale(1);
+   }
+}
+
+@media (orientation: portrait) {
+   .logo-container {
+      margin-top: 8vh;
+   }
+   
+   .home-logo {
+      width: 60px;
+      height: 60px;
+   }
+}

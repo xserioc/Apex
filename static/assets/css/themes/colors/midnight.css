@@ -1,0 +1,13 @@
+:root {
+  --background-image: linear-gradient(135deg, #0a0e27 0%, #1a0d3a 50%, #0f1428 100%);
+  --background-color: #0a0e27;
+  --text-primary: #e0e6ff;
+  --text-dark: #7c3aed;
+  --tab-active-background: #7c3aed;
+  --background-nav: rgba(124, 58, 237, 0.08);
+  --background-input: rgba(124, 58, 237, 0.12);
+  --background-column: rgba(124, 58, 237, 0.08);
+  --background-settings: rgba(10, 14, 39, 0.9);
+  --background-buttons: rgba(124, 58, 237, 0.15);
+  --tab-inactive-background: rgba(124, 58, 237, 0.1);
+}

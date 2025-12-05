@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
+  <title id="t">Login</title>
+  <link rel="stylesheet" href="/assets/css/global.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+      padding: 20px;
+    }
+    .auth-box {
+      background: var(--background-settings);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    .auth-box h1 {
+      text-align: center;
+      color: var(--text-primary);
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--background-input);
+      border-radius: 8px;
+      background: var(--background-input);
+      color: var(--text-primary);
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--slider-active-background);
+    }
+    .auth-button {
+      width: 100%;
+      padding: 14px;
+      background: var(--slider-active-background);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .auth-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .auth-links {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .auth-links a {
+      color: var(--slider-active-background);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+    .error-message {
+      background: rgba(255, 0, 0, 0.1);
+      color: #ff4444;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      display: none;
+    }
+    .success-message {
+      background: rgba(0, 255, 0, 0.1);
+      color: #44ff44;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="f-nav"></div>
+  
+  <div class="auth-container">
+    <div class="auth-box">
+      <h1>Login</h1>
+      <div class="error-message" id="error-message"></div>
+      <div class="success-message" id="success-message"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="auth-button">Login</button>
+      </form>
+      <div class="auth-links">
+        <p>Don't have an account? <a href="/register.html">Register here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/m1.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+      
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          successMsg.textContent = 'Login successful! Redirecting...';
+          successMsg.style.display = 'block';
+          setTimeout(() => {
+            window.location.href = '/profile.html';
+          }, 1000);
+        } else {
+          errorMsg.textContent = data.error || 'Login failed';
+          errorMsg.style.display = 'block';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'An error occurred. Please try again.';
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- AR Logo - Formula 1 inspired style -->
+  <defs>
+    <style>
+      .ar-letter { fill: #FF0000; font-family: Arial, sans-serif; font-weight: bold; font-size: 65px; font-style: italic; }
+    </style>
+  </defs>
+  
+  <!-- Letter A -->
+  <text x="5" y="70" class="ar-letter">A</text>
+  
+  <!-- Letter R with swoosh effect -->
+  <text x="45" y="70" class="ar-letter">R</text>
+  
+  <!-- Swoosh line extending from R -->
+  <path d="M 70 50 Q 85 45 90 35" stroke="#FF0000" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

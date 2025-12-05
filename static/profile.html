@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
+  <title id="t">Profile</title>
+  <link rel="stylesheet" href="/assets/css/global.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .profile-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+      padding: 20px;
+    }
+    .profile-box {
+      background: var(--background-settings);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 600px;
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--slider-active-background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 48px;
+      color: white;
+    }
+    .profile-header h1 {
+      color: var(--text-primary);
+      margin: 10px 0;
+    }
+    .profile-info {
+      margin: 30px 0;
+    }
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      background: var(--background-input);
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .info-label {
+      color: var(--text-placeholder);
+      font-weight: 500;
+    }
+    .info-value {
+      color: var(--text-primary);
+    }
+    .profile-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .profile-button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: var(--slider-active-background);
+      color: white;
+    }
+    .btn-secondary {
+      background: var(--background-input);
+      color: var(--text-primary);
+    }
+    .profile-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .loading {
+      text-align: center;
+      color: var(--text-primary);
+      padding: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="f-nav"></div>
+  
+  <div class="profile-container">
+    <div class="profile-box" id="profile-content">
+      <div class="loading">Loading profile...</div>
+    </div>
+  </div>
+
+  <script src="/assets/js/m1.js"></script>
+  <script>
+    async function loadProfile() {
+      try {
+        const response = await fetch('/api/profile');
+        
+        if (response.ok) {
+          const data = await response.json();
+          displayProfile(data);
+        } else {
+          window.location.href = '/login.html';
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        window.location.href = '/login.html';
+      }
+    }
+    
+    function displayProfile(user) {
+      const profileContent = document.getElementById('profile-content');
+      const initial = user.username.charAt(0).toUpperCase();
+      
+      profileContent.innerHTML = `
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <h1>${user.username}</h1>
+        </div>
+        
+        <div class="profile-info">
+          <div class="info-item">
+            <span class="info-label">Username</span>
+            <span class="info-value">${user.username}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <span class="info-value">${user.email}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">${new Date(user.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <button class="profile-button btn-secondary" onclick="window.location.href='/'">
+            <i class="fa-solid fa-home"></i> Home
+          </button>
+          <button class="profile-button btn-primary" onclick="logout()">
+            <i class="fa-solid fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      `;
+    }
+    
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login.html';
+      } catch (error) {
+        console.error('Error logging out:', error);
+      }
+    }
+    
+    loadProfile();
+  </script>
+</body>
+</html>

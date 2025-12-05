@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
+  <title id="t">Matches</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/assets/css/global.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/container.css?v=2" />
+  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="/assets/css/splash.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="/assets/js/index-3.js"></script>
+  <style>
+    .matches-container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 120px auto 20px;
+    }
+
+    .sport-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .sport-tab {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .sport-tab:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .sport-tab.active {
+      background: var(--accent-color, #6366f1);
+    }
+
+    .matches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .match-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .match-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .match-status {
+      font-size: 12px;
+      color: #10b981;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .match-status.final {
+      color: #6b7280;
+    }
+
+    .match-status.scheduled {
+      color: #fbbf24;
+    }
+
+    .teams {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .team {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .team-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .team-score {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .match-info {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+      font-size: 18px;
+    }
+
+    .no-matches {
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+      font-size: 16px;
+    }
+
+    .live-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .view-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .view-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .view-btn.active {
+      background: var(--accent-color, #6366f1);
+    }
+
+    .date-navigation {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      align-items: center;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .date-nav-btn {
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .date-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .date-nav-btn.active {
+      background: var(--accent-color, #00d4ff);
+      color: white;
+      border-color: var(--accent-color, #00d4ff);
+    }
+
+    .date-nav-btn.today {
+      font-weight: 600;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 20px;
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .standings-table thead {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .standings-table th {
+      padding: 15px;
+      text-align: left;
+      color: #9ca3af;
+      font-weight: 600;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .standings-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .standings-table tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    .standings-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .team-logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .position {
+      font-weight: bold;
+      color: #6b7280;
+      width: 30px;
+      text-align: center;
+    }
+
+    .position.top-4 {
+      color: #10b981;
+    }
+
+    .position.top-2 {
+      color: #3b82f6;
+      font-weight: bold;
+    }
+
+    .position.top-1 {
+      color: #f59e0b;
+      font-weight: bold;
+    }
+
+    .last-5 {
+      display: flex;
+      gap: 4px;
+    }
+
+    .result {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .result.win {
+      background: #10b981;
+      color: white;
+    }
+
+    .result.draw {
+      background: #6b7280;
+      color: white;
+    }
+
+    .result.loss {
+      background: #ef4444;
+      color: white;
+    }
+
+    .game-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .game-modal-content {
+      background: linear-gradient(135deg, #0f1b3c 0%, #1a0f4d 50%, #0a1f4d 100%);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      color: white;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .game-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #00d4ff;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    }
+
+    .game-modal-close:hover {
+      color: white;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .game-teams {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
+    .game-team {
+      flex: 1;
+      text-align: center;
+    }
+
+    .game-team-name {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .game-team-score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+
+    .game-vs {
+      font-size: 14px;
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .game-section {
+      margin-bottom: 25px;
+    }
+
+    .game-section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #00d4ff;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .play-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      border-left: 3px solid #00d4ff;
+      font-size: 14px;
+    }
+
+    .play-time {
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .player-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .player-stat {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .player-name {
+      font-weight: bold;
+      color: #00d4ff;
+      margin-bottom: 6px;
+    }
+
+    .stat-line {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .odds-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .odds-label {
+      color: #9ca3af;
+    }
+
+    .odds-value {
+      color: #00d4ff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .standings-table {
+        font-size: 12px;
+      }
+
+      .standings-table th,
+      .standings-table td {
+        padding: 10px 8px;
+      }
+
+      .team-logo {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+      }
+
+      .result {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="f-nav"></div>
+  
+  <div class="matches-container">
+    <h1 style="color: white; margin-bottom: 30px; font-size: 32px;">Live Sports Scores</h1>
+    
+    <div class="view-toggle" style="margin-bottom: 20px; display: flex; gap: 10px;">
+      <button class="view-btn active" id="matches-view-btn" onclick="switchView('matches')">Matches</button>
+      <button class="view-btn" id="standings-view-btn" onclick="switchView('standings')">Standings</button>
+    </div>
+
+    <!-- Game Details Modal -->
+    <div id="game-details-modal" class="game-modal" style="display: none;">
+      <div class="game-modal-content">
+        <button class="game-modal-close" onclick="closeGameDetails()">&times;</button>
+        <div id="game-details-body">Loading game details...</div>
+      </div>
+    </div>
+    
+    <div id="matches-view">
+      <div class="sport-tabs">
+        <button class="sport-tab active" data-sport="nfl">NFL</button>
+        <button class="sport-tab" data-sport="nba">NBA</button>
+        <button class="sport-tab" data-sport="mlb">MLB</button>
+        <button class="sport-tab" data-sport="nhl">NHL</button>
+        <button class="sport-tab" data-sport="soccer">Soccer</button>
+        <button class="sport-tab" data-sport="college-football">College Football</button>
+      </div>
+
+      <div class="date-navigation" id="date-navigation">
+        <span class="live-badge"><span class="live-indicator" style="width: 6px; height: 6px;"></span>LIVE</span>
+      </div>
+
+      <div id="matches-grid" class="matches-grid">
+        <div class="loading">Loading matches...</div>
+      </div>
+    </div>
+
+    <div id="standings-view" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="sport-tabs" style="margin-bottom: 0;">
+          <button class="sport-tab active" data-league="eng.1">Premier League</button>
+          <button class="sport-tab" data-league="esp.1">La Liga</button>
+          <button class="sport-tab" data-league="ita.1">Serie A</button>
+          <button class="sport-tab" data-league="ger.1">Bundesliga</button>
+          <button class="sport-tab" data-league="fra.1">Ligue 1</button>
+        </div>
+        <button id="refresh-standings-btn" class="view-btn" style="margin: 0;" title="Refresh standings data">🔄 Refresh</button>
+      </div>
+
+      <div id="standings-table" style="overflow-x: auto; margin-top: 20px;">
+        <div class="loading">Loading standings...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/mathematics/bundle.js?v=2025-04-15"></script>
+  <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
+  <script src="/assets/js/m1.js"></script>
+  
+  <script>
+    let currentSport = 'nfl';
+    let currentLeague = 'eng.1';
+    let currentDate = new Date();
+    let refreshInterval;
+    let standingsRefreshInterval;
+    let allMatches = [];
+
+    // Week-based storage functions (weeks start on Sunday)
+    function getWeekNumber() {
+      const now = new Date();
+      const year = now.getFullYear();
+      
+      // Get the most recent Sunday (including today if today is Sunday)
+      const currentSunday = new Date(now);
+      currentSunday.setDate(currentSunday.getDate() - now.getDay());
+      currentSunday.setHours(0, 0, 0, 0);
+      
+      // Get the first day of the year
+      const yearStart = new Date(year, 0, 1);
+      
+      // Get the first Sunday of the year
+      const firstSunday = new Date(yearStart);
+      firstSunday.setDate(firstSunday.getDate() - yearStart.getDay());
+      firstSunday.setHours(0, 0, 0, 0);
+      
+      // Calculate the week number (starting from 1)
+      const diff = currentSunday - firstSunday;
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      const weekNum = Math.floor(diff / oneWeek);
+      
+      return `${year}-W${weekNum}`;
+    }
+
+    function saveMatchesToStorage(sport, matches) {
+      const week = getWeekNumber();
+      const data = {
+        week: week,
+        sport: sport,
+        matches: matches,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(`matches_${sport}`, JSON.stringify(data));
+    }
+
+    function loadMatchesFromStorage(sport) {
+      const stored = localStorage.getItem(`matches_${sport}`);
+      if (!stored) return null;
+      
+      try {
+        const data = JSON.parse(stored);
+        const currentWeek = getWeekNumber();
+        
+        if (data.week !== currentWeek) {
+          localStorage.removeItem(`matches_${sport}`);
+          return null;
+        }
+        
+        return data.matches;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function initDateNavigation() {
+      const dateNav = document.getElementById('date-navigation');
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.gap = '8px';
+      container.style.alignItems = 'center';
+      container.style.overflowX = 'auto';
+      container.style.paddingBottom = '8px';
+      
+      // Add LIVE badge
+      const liveBadge = document.createElement('span');
+      liveBadge.className = 'live-badge';
+      liveBadge.innerHTML = '<span class="live-indicator" style="width: 6px; height: 6px;"></span>LIVE';
+      container.appendChild(liveBadge);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().split('T')[0];
+
+      // Generate date buttons for the next 7 days
+      for (let i = -2; i <= 4; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        
+        const btn = document.createElement('button');
+        btn.className = 'date-nav-btn';
+        
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+        const dayNum = date.getDate();
+        const monthName = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+        
+        const isToday = date.toDateString() === today.toDateString();
+        btn.textContent = isToday ? 'TODAY' : `${dayName} ${dayNum} ${monthName}`;
+        if (isToday) btn.classList.add('today');
+        
+        btn.dataset.date = date.toISOString().split('T')[0];
+        btn.onclick = () => selectDate(btn.dataset.date);
+        
+        // Mark as active if it's today
+        if (isToday) btn.classList.add('active');
+        
+        container.appendChild(btn);
+      }
+      
+      dateNav.innerHTML = '';
+      dateNav.appendChild(container);
+    }
+
+    function selectDate(dateStr) {
+      const buttons = document.querySelectorAll('.date-nav-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      const btn = document.querySelector(`.date-nav-btn[data-date="${dateStr}"]`);
+      if (btn) {
+        btn.classList.add('active');
+      }
+      
+      // Check if we have matches for this date, if not try fetching fresh data
+      const hasMatchesForDate = allMatches.some(event => {
+        const eventDateObj = new Date(event.date);
+        const year = eventDateObj.getFullYear();
+        const month = String(eventDateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(eventDateObj.getDate()).padStart(2, '0');
+        const eventDateStr = `${year}-${month}-${day}`;
+        return eventDateStr === dateStr;
+      });
+      
+      if (!hasMatchesForDate) {
+        // Fetch fresh data if this date has no matches
+        loadMatches(currentSport).then(() => filterMatchesByDate(dateStr));
+      } else {
+        filterMatchesByDate(dateStr);
+      }
+    }
+
+    function filterMatchesByDate(dateStr) {
+      const grid = document.getElementById('matches-grid');
+      
+      if (!allMatches || allMatches.length === 0) {
+        grid.innerHTML = '<div class="no-matches">No matches available for this date</div>';
+        return;
+      }
+      
+      const filteredMatches = allMatches.filter(event => {
+        // Parse the event date as a local date to avoid timezone issues
+        const eventDateObj = new Date(event.date);
+        // Get the local date string (YYYY-MM-DD)
+        const year = eventDateObj.getFullYear();
+        const month = String(eventDateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(eventDateObj.getDate()).padStart(2, '0');
+        const eventDateStr = `${year}-${month}-${day}`;
+        return eventDateStr === dateStr;
+      });
+
+      if (filteredMatches.length === 0) {
+        grid.innerHTML = '<div class="no-matches">No matches scheduled for this date</div>';
+        return;
+      }
+
+      grid.innerHTML = filteredMatches.map(event => {
+        const competition = event.competitions[0];
+        const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
+        const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
+        
+        const status = event.status.type.name;
+        const statusClass = status === 'STATUS_FINAL' ? 'final' : 
+                           status === 'STATUS_SCHEDULED' ? 'scheduled' : '';
+        
+        const isLive = status === 'STATUS_IN_PROGRESS';
+        const statusText = isLive ? 'LIVE' : 
+                          status === 'STATUS_FINAL' ? 'FINAL' :
+                          new Date(event.date).toLocaleString();
+
+        return `
+          <div class="match-card" onclick="openGameDetails('${event.id}', '${currentSport}')">
+            <div class="match-status ${statusClass}">
+              ${isLive ? '<span class="live-indicator"></span>' : ''}
+              ${statusText}
+            </div>
+            <div class="teams">
+              <div class="team">
+                <span class="team-name">${awayTeam.team.displayName}</span>
+                <span class="team-score">${awayTeam.score || '-'}</span>
+              </div>
+              <div class="team">
+                <span class="team-name">${homeTeam.team.displayName}</span>
+                <span class="team-score">${homeTeam.score || '-'}</span>
+              </div>
+            </div>
+            <div class="match-info">
+              ${event.status.type.detail}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function switchView(view) {
+      const matchesView = document.getElementById('matches-view');
+      const standingsView = document.getElementById('standings-view');
+      const matchesBtn = document.getElementById('matches-view-btn');
+      const standingsBtn = document.getElementById('standings-view-btn');
+
+      if (view === 'matches') {
+        matchesView.style.display = 'block';
+        standingsView.style.display = 'none';
+        matchesBtn.classList.add('active');
+        standingsBtn.classList.remove('active');
+      } else {
+        matchesView.style.display = 'none';
+        standingsView.style.display = 'block';
+        matchesBtn.classList.remove('active');
+        standingsBtn.classList.add('active');
+        loadStandings(currentLeague);
+      }
+    }
+
+    async function loadMatches(sport) {
+      const grid = document.getElementById('matches-grid');
+      grid.innerHTML = '<div class="loading">Loading matches...</div>';
+
+      try {
+        // Try to load from storage first
+        let storedMatches = loadMatchesFromStorage(sport);
+        
+        if (storedMatches) {
+          allMatches = storedMatches;
+        } else {
+          // Fetch from API if not in storage
+          const response = await fetch(`/api/sports/${sport}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch sports data');
+          }
+          const data = await response.json();
+          
+          if (!data.events || data.events.length === 0) {
+            grid.innerHTML = '<div class="no-matches">No matches available at the moment</div>';
+            return;
+          }
+
+          allMatches = data.events;
+          // Save to storage for the week
+          saveMatchesToStorage(sport, allMatches);
+        }
+        
+        initDateNavigation();
+        
+        // Show today's matches
+        const todayDate = new Date().toISOString().split('T')[0];
+        filterMatchesByDate(todayDate);
+      } catch (error) {
+        console.error('Error loading matches:', error);
+        grid.innerHTML = '<div class="no-matches">Failed to load matches. Please try again later.</div>';
+      }
+    }
+
+    async function loadStandings(league) {
+      const tableContainer = document.getElementById('standings-table');
+      tableContainer.innerHTML = '<div class="loading">Loading standings...</div>';
+
+      try {
+        const response = await fetch(`/api/standings/${league}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        console.log('Standings data:', data);
+
+        if (!data.standings || data.standings.length === 0) {
+          tableContainer.innerHTML = '<div class="no-matches">No standings data available</div>';
+          return;
+        }
+
+        const standings = data.standings[0].entries || [];
+        
+        if (standings.length === 0) {
+          tableContainer.innerHTML = '<div class="no-matches">No teams in standings</div>';
+          return;
+        }
+        
+        const tableRows = standings.map((team, index) => {
+          const pos = index + 1;
+          const name = team.team?.displayName || 'Unknown';
+          const abbr = team.team?.abbreviation || 'N/A';
+          const stats = team.stats || [];
+          const recentForm = team.recentForm || [];
+          
+          let gp = 0, wins = 0, draws = 0, losses = 0, gf = 0, ga = 0, pts = 0;
+          
+          stats.forEach(stat => {
+            if (stat.name === 'gamesPlayed') gp = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'wins') wins = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'draws') draws = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'losses') losses = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'pointsFor') gf = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'pointsAgainst') ga = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+            else if (stat.name === 'points') pts = stat.displayValue !== undefined ? stat.displayValue : (stat.value !== undefined ? stat.value : 0);
+          });
+          
+          const gd = (gf || 0) - (ga || 0);
+          
+          let posClass = '';
+          if (pos === 1) posClass = 'top-1';
+          else if (pos <= 2) posClass = 'top-2';
+          else if (pos <= 4) posClass = 'top-4';
+
+          const formHtml = recentForm.map(result => {
+            let resultClass = 'loss';
+            if (result === 'W') resultClass = 'win';
+            else if (result === 'D') resultClass = 'draw';
+            return `<span class="result ${resultClass}">${result}</span>`;
+          }).join('');
+
+          return `<tr>
+            <td><div class="position ${posClass}">${pos}</div></td>
+            <td>
+              <div class="team-cell">
+                <div class="team-logo">${abbr.charAt(0)}</div>
+                <span>${name}</span>
+              </div>
+            </td>
+            <td style="text-align: center;">${gp || 0}</td>
+            <td style="text-align: center;">${wins || 0}</td>
+            <td style="text-align: center;">${draws || 0}</td>
+            <td style="text-align: center;">${losses || 0}</td>
+            <td style="text-align: center;">${gf || 0}</td>
+            <td style="text-align: center;">${ga || 0}</td>
+            <td style="text-align: center;">${(gd || 0) > 0 ? '+' : ''}${gd || 0}</td>
+            <td style="text-align: center; font-weight: bold; color: #10b981;">${pts || 0}</td>
+            <td>
+              <div class="last-5">
+                ${formHtml}
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+        
+        const table = `
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">#</th>
+                <th>Club</th>
+                <th style="text-align: center;">MP</th>
+                <th style="text-align: center;">W</th>
+                <th style="text-align: center;">D</th>
+                <th style="text-align: center;">L</th>
+                <th style="text-align: center;">GF</th>
+                <th style="text-align: center;">GA</th>
+                <th style="text-align: center;">GD</th>
+                <th style="text-align: center; font-weight: bold;">Pts</th>
+                <th>Last 5</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        `;
+        
+        tableContainer.innerHTML = table;
+      } catch (error) {
+        console.error('Error loading standings:', error);
+        tableContainer.innerHTML = '<div class="no-matches">Error: ' + error.message + '</div>';
+      }
+    }
+
+    // Initialize matches on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMatches('nfl');
+      refreshInterval = setInterval(() => loadMatches('nfl'), 30000);
+    });
+
+    // Tab switching for matches
+    document.querySelectorAll('#matches-view .sport-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#matches-view .sport-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentSport = tab.dataset.sport;
+        loadMatches(currentSport);
+        
+        if (refreshInterval) clearInterval(refreshInterval);
+        refreshInterval = setInterval(() => loadMatches(currentSport), 30000);
+      });
+    });
+
+    // Tab switching for standings
+    document.querySelectorAll('#standings-view .sport-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#standings-view .sport-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentLeague = tab.dataset.league;
+        loadStandings(currentLeague);
+        
+        if (standingsRefreshInterval) clearInterval(standingsRefreshInterval);
+        standingsRefreshInterval = setInterval(() => loadStandings(currentLeague), 60000);
+      });
+    });
+
+    // Refresh button for standings
+    document.addEventListener('DOMContentLoaded', () => {
+      const refreshBtn = document.getElementById('refresh-standings-btn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+          loadStandings(currentLeague);
+        });
+      }
+    });
+
+    // Initialize standings on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStandings('eng.1');
+      standingsRefreshInterval = setInterval(() => loadStandings('eng.1'), 60000);
+    });
+
+    // Game details modal functions
+    async function openGameDetails(eventId, sport) {
+      const modal = document.getElementById('game-details-modal');
+      const body = document.getElementById('game-details-body');
+      
+      modal.style.display = 'flex';
+      body.innerHTML = 'Loading game details...';
+      console.log(`[FRONTEND] Opening game details for ${sport}/${eventId}`);
+      
+      try {
+        const url = `/api/game-details/${sport}/${eventId}`;
+        console.log(`[FRONTEND] Fetching: ${url}`);
+        const response = await fetch(url);
+        console.log(`[FRONTEND] Response status: ${response.status}`);
+        
+        if (!response.ok) {
+          const errText = await response.text();
+          console.log(`[FRONTEND] Error response: ${errText}`);
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(`[FRONTEND] Data received:`, data);
+        
+        if (!data.event) {
+          throw new Error('No event data in response');
+        }
+        
+        const event = data.event;
+        if (!event.competitions || event.competitions.length === 0) {
+          throw new Error('No competitions data');
+        }
+        
+        const competition = event.competitions[0];
+        const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
+        const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
+        
+        const plays = competition.plays || [];
+        const homeStats = homeTeam.statistics || [];
+        const awayStats = awayTeam.statistics || [];
+        const odds = competition.odds || [];
+        
+        // Extract goals for soccer
+        let homeGoals = [];
+        let awayGoals = [];
+        if (sport === 'soccer' && plays.length > 0) {
+          plays.forEach(play => {
+            const text = (play.text || '').toLowerCase();
+            if (text.includes('goal') || text.includes('scores')) {
+              const goalTime = play.clock?.displayValue || play.period?.number || '?';
+              const scorer = play.athlete?.[0]?.displayName || 'Player';
+              const team = play.team?.id;
+              
+              if (team === homeTeam.team.id) {
+                homeGoals.push({ scorer, time: goalTime });
+              } else if (team === awayTeam.team.id) {
+                awayGoals.push({ scorer, time: goalTime });
+              }
+            }
+          });
+        }
+        
+        let detailsHTML = `
+          <div class="game-header">
+            <div class="game-teams">
+              <div class="game-team">
+                <div class="game-team-name">${awayTeam.team.displayName}</div>
+                <div class="game-team-score">${awayTeam.score || '0'}</div>
+                ${sport === 'soccer' && awayGoals.length > 0 ? `<div style="font-size: 12px; color: #10b981; margin-top: 8px;">${awayGoals.map(g => `${g.scorer} (${g.time}')`).join(', ')}</div>` : ''}
+              </div>
+              <div class="game-vs">${event.status.type.detail}</div>
+              <div class="game-team">
+                <div class="game-team-name">${homeTeam.team.displayName}</div>
+                <div class="game-team-score">${homeTeam.score || '0'}</div>
+                ${sport === 'soccer' && homeGoals.length > 0 ? `<div style="font-size: 12px; color: #10b981; margin-top: 8px;">${homeGoals.map(g => `${g.scorer} (${g.time}')`).join(', ')}</div>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Play-by-play / Goal tracking
+        if (plays && plays.length > 0) {
+          detailsHTML += '<div class="game-section"><div class="game-section-title">Match Events</div>';
+          
+          // Try to find goal plays
+          const goalPlays = plays.filter(play => {
+            const text = (play.text || '').toLowerCase();
+            const typeText = (play.type?.text || '').toLowerCase();
+            return text.includes('goal') || typeText.includes('goal') || text.includes('scores');
+          });
+          
+          if (goalPlays.length > 0) {
+            goalPlays.slice(0, 5).forEach(goal => {
+              try {
+                const goalTime = goal.clock?.displayValue || goal.period?.number || '?';
+                const scorer = goal.athlete?.[0]?.displayName || 'Player';
+                const description = goal.text || 'Goal!';
+                detailsHTML += `<div class="play-item" style="border-left-color: #10b981;"><div class="play-time">${goalTime}'</div><strong>⚽ ${scorer}</strong><br><span style="color: #9ca3af; font-size: 12px;">${description}</span></div>`;
+              } catch (e) {
+                // Skip malformed entries
+              }
+            });
+          }
+          
+          // Show all other plays
+          const otherPlays = plays.filter(p => !goalPlays.includes(p));
+          otherPlays.slice(0, 8).forEach(play => {
+            try {
+              const playTime = play.clock?.displayValue || play.period?.number || '?';
+              const description = play.text || play.type?.text || 'Play';
+              detailsHTML += `<div class="play-item"><div class="play-time">${playTime}'</div>${description}</div>`;
+            } catch (e) {
+              // Skip malformed entries
+            }
+          });
+          
+          detailsHTML += '</div>';
+        }
+        
+        // Team Stats
+        if (homeStats.length > 0 || awayStats.length > 0) {
+          detailsHTML += '<div class="game-section"><div class="game-section-title">Team Stats</div>';
+          detailsHTML += `<div class="player-stats-grid">`;
+          
+          homeStats.slice(0, 4).forEach(stat => {
+            detailsHTML += `<div class="player-stat">
+              <div class="player-name">${homeTeam.team.displayName}</div>
+              <div class="stat-line">${stat.name}: ${stat.displayValue || stat.value}</div>
+            </div>`;
+          });
+          
+          awayStats.slice(0, 4).forEach(stat => {
+            detailsHTML += `<div class="player-stat">
+              <div class="player-name">${awayTeam.team.displayName}</div>
+              <div class="stat-line">${stat.name}: ${stat.displayValue || stat.value}</div>
+            </div>`;
+          });
+          
+          detailsHTML += '</div></div>';
+        }
+        
+        // Odds
+        if (odds && odds.length > 0) {
+          detailsHTML += '<div class="game-section"><div class="game-section-title">Betting Odds</div>';
+          odds.slice(0, 3).forEach(odd => {
+            if (odd && typeof odd === 'object') {
+              detailsHTML += `
+                <div class="odds-item">
+                  <span class="odds-label">${odd.provider?.name || 'Sportsbook'}</span>
+                  <span class="odds-value">${odd.overUnder ? 'O/U: ' + odd.overUnder : 'N/A'}</span>
+                </div>
+              `;
+            }
+          });
+          detailsHTML += '</div>';
+        }
+        
+        detailsHTML += '<div style="font-size: 12px; color: #9ca3af; margin-top: 20px;">Data refreshes automatically every 30 seconds</div>';
+        
+        body.innerHTML = detailsHTML;
+      } catch (error) {
+        console.error('[FRONTEND] Error loading game details:', error.message);
+        console.error('[FRONTEND] Full error:', error);
+        body.innerHTML = `<div style="text-align: center; color: #9ca3af;">Error: ${error.message}</div>`;
+      }
+    }
+    
+    function closeGameDetails() {
+      const modal = document.getElementById('game-details-modal');
+      modal.style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('game-details-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'game-details-modal') {
+        closeGameDetails();
+      }
+    });
+    
+    // Initial load
+    
+    // Monitor view switches and set up appropriate refresh
+    const matchesViewBtn = document.getElementById('matches-view-btn');
+    const standingsViewBtn = document.getElementById('standings-view-btn');
+    
+    if (matchesViewBtn) {
+      matchesViewBtn.addEventListener('click', () => {
+        if (standingsRefreshInterval) clearInterval(standingsRefreshInterval);
+        if (!refreshInterval) {
+          refreshInterval = setInterval(() => loadMatches(currentSport), 30000);
+        }
+      });
+    }
+    
+    if (standingsViewBtn) {
+      standingsViewBtn.addEventListener('click', () => {
+        if (refreshInterval) clearInterval(refreshInterval);
+        if (standingsRefreshInterval) clearInterval(standingsRefreshInterval);
+        standingsRefreshInterval = setInterval(() => loadStandings(currentLeague), 60000);
+      });
+    }
+  </script>
+  <script src="/assets/js/splash.js"></script>
+</body>
+
+</html>

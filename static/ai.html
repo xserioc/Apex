@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
+  <title id="t">NeoNXT AI</title>
+  <link rel="stylesheet" href="/assets/css/global.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+    }
+    
+    .ai-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 10vh);
+      max-width: 1200px;
+      margin: 12vh auto 0;
+      padding: 0 20px;
+    }
+    
+    .ai-header {
+      text-align: center;
+      padding: 30px 0 20px;
+    }
+    
+    .ai-header h1 {
+      color: var(--text-primary);
+      font-size: 48px;
+      margin: 0 0 10px;
+      font-weight: 700;
+    }
+    
+    .ai-header p {
+      color: var(--text-placeholder);
+      font-size: 18px;
+      margin: 0;
+    }
+    
+    .chat-container {
+      flex: 1;
+      background: var(--background-settings);
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .message {
+      display: flex;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .message.user {
+      flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--slider-active-background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .message.user .message-avatar {
+      background: var(--background-input);
+    }
+    
+    .message-content {
+      max-width: 70%;
+      background: var(--background-input);
+      padding: 15px;
+      border-radius: 15px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    
+    .message.user .message-content {
+      background: var(--slider-active-background);
+      color: white;
+    }
+    
+    .input-area {
+      padding: 20px;
+      background: var(--background-nav);
+      border-top: 1px solid var(--background-input);
+    }
+    
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    #message-input {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid var(--background-input);
+      border-radius: 10px;
+      background: var(--background-input);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: "Inter", sans-serif;
+      resize: none;
+      max-height: 150px;
+    }
+    
+    #message-input:focus {
+      outline: none;
+      border-color: var(--slider-active-background);
+    }
+    
+    #send-btn {
+      width: 50px;
+      height: 50px;
+      background: var(--slider-active-background);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    #send-btn:disabled {
+      background: var(--background-input);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .typing-indicator {
+      display: none;
+      gap: 5px;
+      padding: 10px;
+    }
+    
+    .typing-indicator.active {
+      display: flex;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-placeholder);
+      animation: typing 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    .welcome-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-placeholder);
+    }
+    
+    .welcome-message h2 {
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    
+    .suggestions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .suggestion-card {
+      background: var(--background-input);
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .suggestion-card:hover {
+      border-color: var(--slider-active-background);
+      transform: translateY(-2px);
+    }
+    
+    .suggestion-card h3 {
+      color: var(--text-primary);
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    
+    .suggestion-card p {
+      color: var(--text-placeholder);
+      margin: 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="f-nav"></div>
+  
+  <div class="ai-container">
+    <div class="ai-header">
+      <h1>🤖 NeoNXT AI</h1>
+      <p>Your intelligent assistant powered by advanced AI</p>
+    </div>
+    
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="welcome-message">
+          <h2>Welcome to NeoNXT AI!</h2>
+          <p>Ask me anything or try one of these suggestions:</p>
+          <div class="suggestions">
+            <div class="suggestion-card" onclick="sendSuggestion('Tell me about CloudMoon')">
+              <h3>🎮 CloudMoon Info</h3>
+              <p>Learn about cloud gaming</p>
+            </div>
+            <div class="suggestion-card" onclick="sendSuggestion('What can you help me with?')">
+              <h3>💡 Capabilities</h3>
+              <p>Discover what I can do</p>
+            </div>
+            <div class="suggestion-card" onclick="sendSuggestion('Help me with homework')">
+              <h3>📚 Homework Help</h3>
+              <p>Get study assistance</p>
+            </div>
+            <div class="suggestion-card" onclick="sendSuggestion('Write a creative story')">
+              <h3>✨ Creative Writing</h3>
+              <p>Generate creative content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea 
+            id="message-input" 
+            placeholder="Type your message here..." 
+            rows="1"
+            onkeydown="handleKeyPress(event)"
+          ></textarea>
+          <button id="send-btn" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/m1.js"></script>
+  <script>
+    const messagesContainer = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    
+    function handleKeyPress(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+    
+    function sendSuggestion(text) {
+      messageInput.value = text;
+      sendMessage();
+    }
+    
+    function addMessage(text, isUser = false) {
+      const welcomeMsg = messagesContainer.querySelector('.welcome-message');
+      if (welcomeMsg) {
+        welcomeMsg.remove();
+      }
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+      
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          <i class="fa-solid fa-${isUser ? 'user' : 'robot'}"></i>
+        </div>
+        <div class="message-content">${text}</div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message ai';
+      typingDiv.id = 'typing-indicator';
+      typingDiv.innerHTML = `
+        <div class="message-avatar">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div class="typing-indicator active">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function removeTypingIndicator() {
+      const typingIndicator = document.getElementById('typing-indicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+    
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      addMessage(message, true);
+      messageInput.value = '';
+      sendBtn.disabled = true;
+      
+      showTypingIndicator();
+      
+      try {
+        const response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message })
+        });
+        
+        const data = await response.json();
+        
+        removeTypingIndicator();
+        
+        if (response.ok) {
+          addMessage(data.response);
+        } else {
+          addMessage('Sorry, I encountered an error. Please try again.');
+        }
+      } catch (error) {
+        removeTypingIndicator();
+        addMessage('Sorry, I\'m having trouble connecting. Please try again later.');
+      } finally {
+        sendBtn.disabled = false;
+        messageInput.focus();
+      }
+    }
+    
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+    });
+  </script>
+</body>
+</html>
